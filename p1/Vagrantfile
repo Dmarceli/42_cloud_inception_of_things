@@ -1,34 +1,37 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+#alvistack/ubuntu-25.10
+
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 Vagrant.configure(2) do |config|
+  ssh_pub_key = File.exist?(File.expand_path("~/.ssh/id_rsa.pub")) ? File.read(File.expand_path("~/.ssh/id_rsa.pub")).strip : ""
 
-  config.vm.provision "shell", path: "./scripts/preparation.sh"
+  config.vm.provision "shell", path: "./scripts/preparation.sh", env: {"SSH_PUB_KEY" => ssh_pub_key}
 
   # Kubernetes Master Server
   config.vm.define "dmarceliS" do |kmaster|
-    kmaster.vm.box = "boxen/ubuntu-24.10"
+    kmaster.vm.box = "alvistack/ubuntu-25.10"
     kmaster.vm.hostname = "dmarceliS"
     kmaster.vm.network "private_network", ip: "192.168.56.110"
     kmaster.vm.provider "virtualbox" do |v|
       v.name = "dmarceliS"
-      v.memory = 1024
-      v.cpus = 1
+      v.memory = 2048
+      v.cpus = 2
     end
    kmaster.vm.provision "shell", path: "./scripts/bootstrap_kmaster.sh"
   end
 
 
   config.vm.define "dmarceliSW" do |workernode|
-    workernode.vm.box = "boxen/ubuntu-24.10"
+    workernode.vm.box = "alvistack/ubuntu-25.10"
     workernode.vm.hostname = "dmarceliSW"
     workernode.vm.network "private_network", ip: "192.168.56.111"
     workernode.vm.provider "virtualbox" do |v|
       v.name = "dmarceliSW"
-      v.memory = 1024
-      v.cpus = 1
+      v.memory = 2048
+      v.cpus = 2
     end
    workernode.vm.provision "shell", path: "./scripts/bootstrap_kworker.sh"
     end

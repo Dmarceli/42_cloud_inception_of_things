@@ -1,0 +1,87 @@
+# #these 2 for testing purposes
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: app1
+#   #namespace: kube-system
+#   labels:
+#     app: app1  
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: app1
+#   template:
+#     metadata:
+#       labels:
+#         app: app1
+#     spec:
+#       containers:
+#       - name: app1
+#         image: daniginga/iot-basic-backend:app1
+#         ports:
+#         - containerPort: 3000
+
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: app1-svc
+#   #namespace: kube-system  
+# spec:
+#   ports:
+#   - protocol: TCP
+#     port: 80
+#     targetPort: 3000
+#   selector:
+#     app: app1
+
+# ---
+
+
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: app1-ing
+#   #namespace: kube-system
+#   annotations:
+#     # traefik.ingress.kubernetes.io/app-root: "/"
+#     app.kubernetes.io/instance: traefik-kube-system
+#     app.kubernetes.io/name: traefik
+# spec:
+#   rules:
+#   - host : 
+#     http:
+#       paths:
+#       - path: /
+#         pathType: ImplementationSpecific
+#         backend:
+#           service:
+#             name: app1-svc
+#             port:
+#               number: 80
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argo-ing
+  #namespace: kube-system
+  # annotations:
+  #   # app.kubernetes.io/instance: traefik-kube-system
+  #   # app.kubernetes.io/name: traefik
+  #   ingress.kubernetes.io/ssl-redirect: "false"
+  #   ingress.kubernetes.io/force-ssl-redirect: "false"
+  #   ingress.kubernetes.io/ssl-passthrough: "false"
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: argo-cd-42.ncameiri
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 80

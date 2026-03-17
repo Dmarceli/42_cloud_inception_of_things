@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Load environment variables from the Vagrant synced folder
+source /vagrant/scripts/.env
+
 echo "[TASK 1] Join node to Kubernetes Cluster"
 
 while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
@@ -13,9 +17,9 @@ apt-get  install -y sshpass
 
 
 #get join script from master 
-sshpass -p "kubeadmin" scp -o StrictHostKeyChecking=no root@dmarcelis.42.com:/home/vagrant/joincluster.sh .
+sshpass -p "${ROOT_PASSWORD}" scp -o StrictHostKeyChecking=no root@dmarcelis.42.com:/home/vagrant/joincluster.sh .
 mkdir -p /etc/rancher/k3s
-sshpass -p "kubeadmin" scp -o StrictHostKeyChecking=no root@dmarcelis.42.com:/etc/rancher/k3s/k3s.yaml /etc/rancher/k3s/k3s.yaml
+sshpass -p "${ROOT_PASSWORD}" scp -o StrictHostKeyChecking=no root@dmarcelis.42.com:/etc/rancher/k3s/k3s.yaml /etc/rancher/k3s/k3s.yaml
 bash joincluster.sh 
 sed -i 's/127.0.0.1/192.168.56.110/' /etc/rancher/k3s/k3s.yaml
 kubectl label node "$(hostname | tr '[:upper:]' '[:lower:]')" node-role.kubernetes.io/worker=true

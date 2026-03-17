@@ -1,15 +1,13 @@
 
-Instalar no browser app tipo ModHeader
-
+Pre requisitos:
+- Instalar no browser app tipo ModHeader
+- Instalar Vagrant e VirtualBox na VM 
+- dar set da Default Machine folder para uma dir que tenha capacidade
 p1
 
 boxes images
 https://portal.cloud.hashicorp.com/vagrant/discover?architectures=amd64&next=CixXeUl5TURJMExURXhMVEkwVkRBeE9qUXhPalV4TGpZek5UTTVNVm9pWFE9PQ%3D%3D&providers=virtualbox&query=ubuntu&sort=updated_at%20desc
 Alterar setup Vbox -  https://www.thisprogrammingthing.com/2013/changing-the-directory-vagrant-stores-the-vms-in/
-
-levantar com -> vagrant up
-
-vagrant ssh dmarceliS
 
 https://developer.hashicorp.com/vagrant/tutorials/getting-started/getting-started-index
 https://www.exxactcorp.com/blog/HPC/building-a-kubernetes-cluster-using-vagrant
@@ -18,12 +16,24 @@ cat /etc/vbox/networks.conf
 * 172.42.42.100/16 192.168.0.0/16
 * 2001::/64
 
+levantar com -> vagrant up
+
+vagrant ssh dmarceliS
+ou
+ssh root@192.168.56.110
+
+
+
 https://www.virtuozzo.com/company/blog/scaling-kubernetes/
 
+Obter o kubeconfig do k3s
+cat /etc/rancher/k3s/k3s.yaml
 
 https://www.letscloud.io/community/how-to-install-kubernetesk8s-and-docker-on-ubuntu-2004
 https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
 kubectl create deployment nginx --image=nginx
+kubectl run debug-container -it --image=ubuntu
+
 
 https://spacelift.io/blog/kubernetes-ingress
 https://stackoverflow.com/questions/44110876/kubernetes-service-external-ip-pending
@@ -87,7 +97,7 @@ http://192.168.56.110:80/ -> argo-cd-42.ncameiri:80
 
 ao criar a app
 application name -> 42-app
-repository url -> https://github.com/ncameiri/ncameiri_argocd_sync.git
+repository url -> https://github.com/ncameiri42/ncameiri_argocd_sync.git
 revision HEAD
 Path app-control
 
@@ -130,13 +140,29 @@ helm upgrade --install gitlab gitlab/gitlab \
 
 A partir do docker da maq
 
+until [ ! -z $K3D_IP ]; do K3D_IP=$(kubectl get svc -A | grep traefik | tr " " "\n" | grep "172."); done 2>/dev/null
+
+helm repo add gitlab https://charts.gitlab.io/
+helm repo update
 helm upgrade --install gitlab gitlab/gitlab \
   --timeout 600s \
-  --set global.hosts.domain=ncameiri.42 \
-  --set global.hosts.externalIP=127.0.0.1 \
+  --set global.hosts.domain=ncameiri.42.com \
+  --set global.hosts.externalIP=$K3D_IP \
   --set certmanager-issuer.email=me@example.com \
   --set gitlab-runner.install=false \
   --set nginx-ingress.enabled=false 
+
+kubectl patch ing gitlab-webservice-default -p '{"spec": {"ingressClassName": "traefik"}}'
+
+https://argo-cd.readthedocs.io/en/stable/user-guide/private-repositories/
+
+
+
+http://10.42.0.32:8181/root/iot.git
+git clone https://gitlab-webservice-default:8181/root/iot.git
+
+kubectl get svc gitlab-webservice-default -o wide  --output json | jq '.spec.clusterIP'
+
 
 #################
 

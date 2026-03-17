@@ -29,7 +29,7 @@ sudo service docker start
 
 ###########################
 ###########################
-#FIM - DOCKER
+#FIM - DOCKER INSTALL
 ###########################
 
 

@@ -2,19 +2,20 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  ssh_pub_key = File.exist?(File.expand_path("~/.ssh/id_rsa.pub")) ? File.read(File.expand_path("~/.ssh/id_rsa.pub")).strip : ""
 
-  config.vm.provision "shell", path: "./scripts/preparation.sh", env: {"SSH_PUB_KEY" => ssh_pub_key}
+  #config.vm.provision "shell", path: "./scripts/setup.sh"
 
   # Kubernetes Master Server
   config.vm.define "dmarceliS" do |kmaster|
-    kmaster.vm.box = "alvistack/ubuntu-25.10"
+    kmaster.vm.box = "boxen/ubuntu-24.10"
+    # vagrant plugin install vagrant-disksize
+    # kmaster.disksize.size = '50GB'
     kmaster.vm.hostname = "dmarceliS"
     kmaster.vm.network "private_network", ip: "192.168.56.110"
     kmaster.vm.provider "virtualbox" do |v|
       v.name = "dmarceliS"
-      v.memory = 2048
-      v.cpus = 2
+      v.memory = 6144
+      v.cpus = 3
     end
   end
 
