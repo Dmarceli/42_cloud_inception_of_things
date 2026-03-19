@@ -3,8 +3,8 @@ wget  https://github.com/k3d-io/k3d/releases/download/v5.6.0/k3d-linux-amd64
 chmod +x k3d-linux-amd64
 
 #Install kubectl
-# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-# chmod +x kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
 
 ./k3d-linux-amd64 cluster create iot  -p "80:80@loadbalancer" -p "8888:8888@loadbalancer" -p "443:443@loadbalancer"
 
@@ -24,7 +24,7 @@ while true; do
 done
 
 git clone https://github.com/ncameiri/ncameiri_argocd_sync.git
-./kubectl apply -f /home/vagrant/ncameiri_argocd_sync/app-control/test-app.yaml
+./kubectl apply -f ./ncameiri_argocd_sync/app-control/test-app.yaml
 
 ./kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d ; echo
 
